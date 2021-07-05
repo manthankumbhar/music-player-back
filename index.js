@@ -8,6 +8,9 @@ const bcrypt = require("bcrypt");
 const pool = require("./database");
 const { generateUploadURL, downloadURL } = require("./s3");
 
+const config = require("./twilio");
+const client = require("twilio")(config.accountSID, config.authToken);
+
 app.use(express.json());
 app.use(cors());
 
@@ -102,6 +105,32 @@ app.post("/songs/:id", async (req, res) => {
   const id = req.params.id;
   const url = await downloadURL(id);
   res.json({ success: url });
+});
+
+app.post("/forget_password_trigger", async (req, res) => {
+  var reqData = req.body;
+  await client.verify
+    .services(config.serviceID)
+    .verifications.create({
+      to: `+${reqData.phone}`,
+      channel: "sms",
+    })
+    .then((data) => {
+      res.status(200).send(data);
+    });
+});
+
+app.post("/forget_password_verify", async (req, res) => {
+  var reqData = req.body;
+  await client.verify
+    .services(config.serviceID)
+    .verificationChecks.create({
+      to: `+${reqData.phone}`,
+      code: reqData.code,
+    })
+    .then((data) => {
+      res.status(200).send(data);
+    });
 });
 
 app.listen(port, () => {
