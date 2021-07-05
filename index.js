@@ -6,6 +6,7 @@ const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const pool = require("./database");
+const { generateUploadURL, downloadURL } = require("./s3");
 
 app.use(express.json());
 app.use(cors());
@@ -90,6 +91,17 @@ app.post("/user_auth", async (req, res) => {
   } else {
     res.status(400).json({ error: "incorrect email or password" });
   }
+});
+
+app.post("/s3url", async (req, res) => {
+  const url = await generateUploadURL();
+  res.json({ success: url });
+});
+
+app.post("/songs/:id", async (req, res) => {
+  const id = req.params.id;
+  const url = await downloadURL(id);
+  res.json({ success: url });
 });
 
 app.listen(port, () => {
