@@ -1,0 +1,31 @@
+POST http://localhost:3000/user_signup
+Content-Type: application/json
+
+{
+    "email":"test",
+    "password":"test123"
+}
+###
+POST http://localhost:3000/s3url
+Content-Type: multipart/form-data
+
+###
+POST http://localhost:3000/songs/acf86ca66e3cf07efc34739a2b72e26d
+Content-Type: multipart/form-data
+
+###
+POST http://localhost:3000/forget_password_trigger
+Content-Type: application/json
+
+{
+    "phone":"917506759224"
+}
+
+###
+POST http://localhost:3000/forget_password_verify
+Content-Type: application/json
+
+{
+    "phone":"917506759224",
+    "code":""
+}
