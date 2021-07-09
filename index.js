@@ -96,6 +96,25 @@ app.post("/user_auth", async (req, res) => {
   }
 });
 
+async function reset_password(email, password) {
+  const data = await pool.query(
+    `update auth_user_info set password = $2 where email = $1`,
+    [email, password]
+  );
+  return await get_auth_user_info_by_email(email);
+}
+
+app.post("/reset_password", async (req, res) => {
+  var reqData = req.body;
+  var hashedPassword = await bcrypt.hash(reqData.password, 10);
+  var user_info_from_db = await reset_password(reqData.email, hashedPassword);
+  if (await bcrypt.compare(reqData.password, user_info_from_db["password"])) {
+    res.status(200).json({ success: "Password reset successful!" });
+  } else {
+    res.status(400).json({ error: "Please try again later!" });
+  }
+});
+
 app.post("/s3url", async (req, res) => {
   const url = await generateUploadURL();
   res.json({ success: url });
